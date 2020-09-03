@@ -34,9 +34,9 @@ const SS = window.sessionStorage
 export default {
   name: 'Enroll',
   data: () => ({
-    title: '',
+    title: '正在加载选课数据...',
     courses: null,
-    loading: false,
+    loading: true,
     dialog: false,
     tip: '',
     style: '',
@@ -45,12 +45,10 @@ export default {
     enrolLoading: false,
     ticket: false
   }),
-  async mounted () {
-    this.loading = true
-    this.title = '正在加载选课数据...'
+  mounted () {
     if (!SS.token) {
       this.title = '请先登录'
-      window.location.href = '/user/#/?c=/enroll/' + this.$route.params.id
+      window.location.href = '/user/#/?c=/enroll/#/enroll/' + this.$route.params.id
       return
     }
     this.fetchCourses()
