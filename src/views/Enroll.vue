@@ -30,6 +30,7 @@
 </template>
 <script>
 const SS = window.sessionStorage
+let timer
 
 export default {
   name: 'Enroll',
@@ -43,15 +44,31 @@ export default {
     course: 0,
     record: null,
     enrolLoading: false,
+    countdown: -100,
     ticket: false
   }),
   mounted () {
     if (!SS.token) {
       this.title = '请先登录'
-      window.location.href = '/user/#/?c=/enroll/#/enroll/' + this.$route.params.id
+      window.location.href = '/user/#/?c=/enroll/%23/enroll/' + this.$route.params.id
       return
     }
     this.fetchCourses()
+  },
+  watch: {
+    countdown () {
+      if (this.countdown <= 0) {
+        clearInterval(timer)
+        this.title = '正在加载选课数据...'
+        this.fetchCourses()
+        return
+      }
+      const d = new Date(this.countdown * 1000)
+      const hh = d.getUTCHours().toString().padStart(2, '0')
+      const mm = d.getUTCMinutes().toString().padStart(2, '0')
+      const ss = d.getSeconds().toString().padStart(2, '0')
+      this.title = `距离选课开始还有 ${hh}:${mm}:${ss}`
+    }
   },
   methods: {
     async fetchCourses () {
@@ -74,6 +91,12 @@ export default {
         if (err.response.status === 403) {
           await new Promise(resolve => setTimeout(resolve, 1000))
           window.location.href = '/index.html'
+        }
+        if (err.response.status === 406) {
+          this.countdown = err.response.data
+          timer = setInterval(() => {
+            this.countdown--
+          }, 1000)
         }
       }
     },
