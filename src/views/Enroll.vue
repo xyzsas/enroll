@@ -17,7 +17,7 @@
     <v-dialog v-model="dialog" max-width="290">
       <v-card>
         <v-card-title>确认选课</v-card-title>
-        <v-card-text>你确认要选择<code>{{ courses ? courses[course].name : '' }}</code>么</v-card-text>
+        <v-card-text>你确认要选择<code>{{ courses ? courses[course].name : '' }}</code>么？</v-card-text>
         <v-card-text :style="style">{{ tip }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -75,7 +75,7 @@ export default {
       try {
         const { data } = await this.$ajax({
           method: 'GET',
-          url: `/enroll/enroll?id=${this.$route.params.id}`,
+          url: `/enroll?id=${this.$route.params.id}`,
           headers: { token: SS.token }
         })
         this.courses = data.courses
@@ -103,11 +103,12 @@ export default {
     async enroll () {
       if (this.record || this.enrolLoading) {
         this.dialog = false
+        this.tip = ''
         return
       }
       this.enrolLoading = true
       try {
-        await this.$ajax.post('/enroll/enroll', {
+        await this.$ajax.post('/enroll', {
           course: this.course.toString()
         }, {
           headers: { ticket: this.ticket }
@@ -116,6 +117,7 @@ export default {
         this.style = 'color: green;'
         await new Promise(resolve => setTimeout(resolve, 1500))
         this.dialog = false
+        this.tip = ''
         this.courses = [this.courses[this.course]]
         this.record = this.course.toString()
       } catch (err) {
@@ -124,6 +126,7 @@ export default {
         await new Promise(resolve => setTimeout(resolve, 2000))
         await this.fetchCourses()
         this.dialog = false
+        this.tip = ''
       }
       this.enrolLoading = false
     }
