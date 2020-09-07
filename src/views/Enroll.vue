@@ -63,10 +63,12 @@ export default {
         this.fetchCourses()
         return
       }
-      const d = new Date(this.countdown * 1000)
-      const hh = d.getUTCHours().toString().padStart(2, '0')
-      const mm = d.getUTCMinutes().toString().padStart(2, '0')
-      const ss = d.getSeconds().toString().padStart(2, '0')
+      let sec = this.countdown
+      const hh = String(Math.floor(sec / 3600)).padStart(2, '0')
+      sec = sec % 3600
+      const mm = String(Math.floor(sec / 60)).padStart(2, '0')
+      sec = sec % 60
+      const ss = String(sec).padStart(2, '0')
       this.title = `距离选课开始还有 ${hh}:${mm}:${ss}`
     }
   },
