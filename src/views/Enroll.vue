@@ -17,7 +17,7 @@
     <v-dialog v-model="dialog" max-width="290">
       <v-card>
         <v-card-title>确认选课</v-card-title>
-        <v-card-text>你确认要选择<code>{{ courses ? courses[course].name : '' }}</code>么？</v-card-text>
+        <v-card-text>你确认要选择<code>{{ courses[course] ? courses[course].name : '' }}</code>么？</v-card-text>
         <v-card-text :style="style">{{ tip }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -36,7 +36,7 @@ export default {
   name: 'Enroll',
   data: () => ({
     title: '正在加载选课数据...',
-    courses: null,
+    courses: [],
     loading: true,
     dialog: false,
     tip: '',
