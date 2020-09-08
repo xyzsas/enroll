@@ -44,7 +44,7 @@ export default {
     course: 0,
     record: null,
     enrolLoading: false,
-    countdown: -100,
+    start: -1,
     ticket: false
   }),
   mounted () {
@@ -54,23 +54,6 @@ export default {
       return
     }
     this.fetchCourses()
-  },
-  watch: {
-    countdown () {
-      if (this.countdown <= 0) {
-        clearInterval(timer)
-        this.title = '正在加载选课数据...'
-        this.fetchCourses()
-        return
-      }
-      let sec = this.countdown
-      const hh = String(Math.floor(sec / 3600)).padStart(2, '0')
-      sec = sec % 3600
-      const mm = String(Math.floor(sec / 60)).padStart(2, '0')
-      sec = sec % 60
-      const ss = String(sec).padStart(2, '0')
-      this.title = `距离选课开始还有 ${hh}:${mm}:${ss}`
-    }
   },
   methods: {
     async fetchCourses () {
@@ -95,10 +78,8 @@ export default {
           window.location.href = '/index.html'
         }
         if (err.response.status === 406) {
-          this.countdown = err.response.data
-          timer = setInterval(() => {
-            this.countdown--
-          }, 1000)
+          this.start = Math.floor(Date.now()/1000) + Number(err.response.data)
+          timer = setInterval(this.countdown, 200)
         }
       }
     },
@@ -131,6 +112,19 @@ export default {
         this.tip = ''
       }
       this.enrolLoading = false
+    },
+    countdown () {
+      const sec = this.start - Math.floor(Date.now() / 1000)
+      if (sec <= 0) {
+        clearInterval(timer)
+        this.title = '正在加载选课数据...'
+        this.fetchCourses()
+        return
+      }
+      const hh = String(Math.floor(sec / 3600)).padStart(2, '0')
+      const mm = String(Math.floor(sec / 60 % 60)).padStart(2, '0')
+      const ss = String(sec % 60).padStart(2, '0')
+      this.title = `距离选课开始还有 ${hh}:${mm}:${ss}`
     }
   }
 }
