@@ -78,7 +78,7 @@ export default {
           window.location.href = '/index.html'
         }
         if (err.response.status === 406) {
-          this.start = Math.floor(Date.now()/1000) + Number(err.response.data)
+          this.start = Math.floor(Date.now() / 1000) + Number(err.response.data)
           timer = setInterval(this.countdown, 200)
         }
       }
