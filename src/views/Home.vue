@@ -3,7 +3,7 @@
     <v-card class="form">
       <h1>学生事务系统</h1>
       <h3>选课</h3>
-      <v-text-field ref="input" style="width: 250px;" label="选课事务id" outlined rounded v-model="input" hint="请输入选课事务编号" @keyup.enter="next"></v-text-field>
+      <v-text-field ref="input" style="width: 250px;" label="选课事务id" outlined rounded v-model="input" hint="请输入选课事务编号" @keyup.enter="next" prefix="ENROLL"></v-text-field>
       <v-btn :disabled="!input" fab color="primary" @click="next">
         <v-icon>mdi-arrow-right</v-icon>
       </v-btn>
@@ -20,7 +20,7 @@ export default {
   methods: {
     next () {
       if (!this.input) return
-      this.$router.push('/enroll/' + this.input)
+      this.$router.push('/enroll/ENROLL' + this.input)
     }
   }
 }

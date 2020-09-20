@@ -14,6 +14,11 @@ const routes = [
     path: '/enroll/:id',
     name: 'Enroll',
     component: Enroll
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import(/* webpackChunkName: "admun" */ '../views/Admin.vue')
   }
 ]
 
