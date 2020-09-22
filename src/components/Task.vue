@@ -17,6 +17,9 @@
           <v-btn color="secondary" @click="submit" :loading="submitLoading">修改事务信息</v-btn>
         </v-col>
         <v-col>
+          <message :group="group" :template="template">发布事务</message>
+        </v-col>
+        <v-col>
           <v-btn color="error" @click="del = true" :loading="submitLoading">删除事务</v-btn>
         </v-col>
       </v-row>
@@ -38,6 +41,7 @@
 <script>
 import Group from '@/components/Group.vue'
 import Course from '@/components/Course.vue'
+import Message from '@/components/Message.vue'
 import TimeSelector from '@/components/TimeSelector.vue'
 const SS = window.sessionStorage
 
@@ -57,7 +61,7 @@ export default {
   }),
   props: ['tid', 'random'],
   components: {
-    Group, TimeSelector, Course
+    Group, TimeSelector, Course, Message
   },
   mounted () {
     if (this.tid) {
@@ -79,6 +83,18 @@ export default {
       if (this.loading) return '正在加载数据...'
       if (this.title) return this.title
       return '请在事务列表选择事务'
+    },
+    template () {
+      const WL = window.location
+      const timeString = new Date(this.start * 1000 - new Date().getTimezoneOffset() * 60000).toISOString().replace('T', ' ').substr(0, 19)
+      return {
+        msg: { key: this.id, value: this.title, expire: 86400 },
+        push: {
+          linkText: '点击前往事务',
+          link: WL.protocol + '//' + WL.hostname + '/enroll/#/enroll/' + this.id,
+          text: `### 事务提醒 \n > ${this.title} \n > \n > 开始时间：${timeString}`
+        }
+      }
     }
   },
   methods: {
