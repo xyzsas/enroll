@@ -1,12 +1,12 @@
 <template>
   <div class="enroll">
     <h1>{{ title }}</h1>
-    <p v-if="!(record || loading)">请点击选择课程<br>括号中的数字为剩余名额</p>
-    <p v-if="record && !loading">您已完成选课：</p>
+    <p v-if="!record && courses.length">请点击选择课程<br>括号中的数字为剩余名额</p>
+    <p v-if="record && courses.length">您已完成选课：</p>
     <v-btn
       v-for="(value, i) in courses"
       :key="i"
-      @click="dialog=true; course=i"
+      @click="enroll(i)"
       text large
       :disabled="Boolean(record || !value.space)"
       style="width: 100%; max-width: 600px; text-align: left; display: block; white-space: normal;"
@@ -14,18 +14,12 @@
       <span style="width: 92%">{{ value.name }}</span>
       <span style="width: 8%; float: right;"><b>({{ value.space }})</b></span>
     </v-btn>
-    <v-dialog v-model="dialog" max-width="290">
-      <v-card>
-        <v-card-title>确认选课</v-card-title>
-        <v-card-text>你确认要选择<code>{{ courses[course] ? courses[course].name : '' }}</code>么？</v-card-text>
-        <v-card-text :style="style">{{ tip }}</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text color="error" :loading="enrolLoading" @click="enroll">确定</v-btn>
-          <v-btn text @click="dialog=false; tip=''">取消</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <v-overlay :value="enrolLoading">
+      <v-progress-circular
+        indeterminate
+        size="64"
+      ></v-progress-circular>
+    </v-overlay>
   </div>
 </template>
 <script>
@@ -37,11 +31,6 @@ export default {
   data: () => ({
     title: '正在加载选课数据...',
     courses: [],
-    loading: true,
-    dialog: false,
-    tip: '',
-    style: '',
-    course: 0,
     record: null,
     enrolLoading: false,
     start: -1,
@@ -70,7 +59,6 @@ export default {
           this.courses = [data.courses[data.record]]
           this.record = data.record
         } else this.courses = data.courses
-        this.loading = false
       } catch (err) {
         this.title = err.response.data
         if (err.response.status === 403) {
@@ -83,34 +71,32 @@ export default {
         }
       }
     },
-    async enroll () {
-      if (this.record || this.enrolLoading) {
-        this.dialog = false
-        this.tip = ''
-        return
-      }
+    async enroll (c) {
+      if (this.record || this.enrolLoading) return
+      const res = await this.$swal.fire({
+        icon: 'question',
+        title: '确认？',
+        html: `你确认要选择<code> ${this.courses[c].name} </code>么？`,
+        showCancelButton: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      })
+      if (!res.isConfirmed) return
       this.enrolLoading = true
-      try {
-        await this.$ajax.post('/enroll', {
-          course: this.course.toString()
-        }, {
-          headers: { ticket: this.ticket }
+      await this.$ajax.post('/enroll', {
+        course: c.toString()
+      }, { headers: { ticket: this.ticket } })
+        .then(res => {
+          this.courses = [this.courses[c]]
+          this.record = c.toString()
         })
-        this.tip = '选课成功！'
-        this.style = 'color: green;'
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        this.dialog = false
-        this.tip = ''
-        this.courses = [this.courses[this.course]]
-        this.record = this.course.toString()
-      } catch (err) {
-        this.tip = err.response.data
-        this.style = 'color: red;'
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        await this.fetchCourses()
-        this.dialog = false
-        this.tip = ''
-      }
+        .catch(err => {
+          console.log(err)
+          this.$swal.fire('错误', err.response ? err.response.data : '网络错误', 'error')
+          this.title = '正在加载选课数据...'
+          this.courses = []
+          this.fetchCourses()
+        })
       this.enrolLoading = false
     },
     countdown () {
