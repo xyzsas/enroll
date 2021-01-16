@@ -20,7 +20,7 @@
           <message :group="group" :template="template">发布事务</message>
         </v-col>
         <v-col>
-          <v-btn color="error" @click="del = true" :loading="submitLoading">删除事务</v-btn>
+          <v-btn color="error" @click="remove" :loading="submitLoading">删除事务</v-btn>
         </v-col>
       </v-row>
     </div>
@@ -126,7 +126,15 @@ export default {
       this.$forceUpdate()
     },
     async remove () {
-      this.del = false
+      const res = await this.$swal.fire({
+        title: '删除事务',
+        text: '删除事务会删除此事务以及全部数据，你确定删除么？',
+        showCancelButton: true,
+        confirmButtonText: '删除',
+        cancelButtonText: '关闭',
+        confirmButtonColor: '#d33'
+      })
+      if (!res.isConfirmed) return
       this.submitLoading = true
       try {
         await this.$ajax.delete('/admin/record?id=' + this.tid, { headers: { token: SS.token } })
