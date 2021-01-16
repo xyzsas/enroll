@@ -24,17 +24,6 @@
         </v-col>
       </v-row>
     </div>
-    <v-dialog v-model="del" max-width="400px" justify="center">
-      <v-card>
-        <v-card-title>删除事务</v-card-title>
-        <v-card-text>删除事务会删除此事务以及全部数据，你确定删除么？</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="del = false">关闭</v-btn>
-          <v-btn color="red" text @click="remove">删除</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -56,8 +45,7 @@ export default {
     start: '',
     group: '',
     submitTip: '',
-    alertType: '',
-    del: false
+    alertType: ''
   }),
   props: ['tid', 'random'],
   components: {
