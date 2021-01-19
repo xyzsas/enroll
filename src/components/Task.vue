@@ -74,7 +74,10 @@ export default {
     },
     template () {
       const WL = window.location
-      const timeString = new Date(this.start * 1000 - new Date().getTimezoneOffset() * 60000).toISOString().replace('T', ' ').substr(0, 19)
+      let timeString = '未设置开始时间'
+      if (this.start !== 'undefined') {
+        timeString = new Date(this.start * 1000 - new Date().getTimezoneOffset() * 60000).toISOString().replace('T', ' ').substr(0, 19)
+      }
       return {
         msg: { key: this.id, value: this.title, expire: 86400 },
         push: {
@@ -93,7 +96,8 @@ export default {
         this.title = data.title
         this.id = this.tid
         this.group = data.group
-        this.start = String(data.start)
+        if (data.start !== 'undefined') this.start = String(data.start)
+        else this.start = '未设置开始时间'
         this.courses = []
         // parse course list
         if (data.course && data.course.length > 0) {
