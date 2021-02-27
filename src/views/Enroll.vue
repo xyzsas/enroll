@@ -74,7 +74,8 @@ export default {
     async enroll (c) {
       if (this.record || this.enrolLoading) return
       const res = await this.$swal.fire({
-        title: '确认选课',
+        icon: 'question',
+        title: '确认？',
         html: `你确认要选择<code> ${this.courses[c].name} </code>么？`,
         showCancelButton: true,
         confirmButtonText: '确定',
