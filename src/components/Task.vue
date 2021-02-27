@@ -20,21 +20,10 @@
           <message :group="group" :template="template">发布事务</message>
         </v-col>
         <v-col>
-          <v-btn color="error" @click="del = true" :loading="submitLoading">删除事务</v-btn>
+          <v-btn color="error" @click="remove" :loading="submitLoading">删除事务</v-btn>
         </v-col>
       </v-row>
     </div>
-    <v-dialog v-model="del" max-width="400px" justify="center">
-      <v-card>
-        <v-card-title>删除事务</v-card-title>
-        <v-card-text>删除事务会删除此事务以及全部数据，你确定删除么？</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="del = false">关闭</v-btn>
-          <v-btn color="red" text @click="remove">删除</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -56,8 +45,7 @@ export default {
     start: '',
     group: '',
     submitTip: '',
-    alertType: '',
-    del: false
+    alertType: ''
   }),
   props: ['tid', 'random'],
   components: {
@@ -86,7 +74,10 @@ export default {
     },
     template () {
       const WL = window.location
-      const timeString = new Date(this.start * 1000 - new Date().getTimezoneOffset() * 60000).toISOString().replace('T', ' ').substr(0, 19)
+      let timeString = '未设置开始时间'
+      if (this.start !== 'undefined') {
+        timeString = new Date(this.start * 1000 - new Date().getTimezoneOffset() * 60000).toISOString().replace('T', ' ').substr(0, 19)
+      }
       return {
         msg: { key: this.id, value: this.title, expire: 86400 },
         push: {
@@ -105,7 +96,8 @@ export default {
         this.title = data.title
         this.id = this.tid
         this.group = data.group
-        this.start = String(data.start)
+        if (data.start !== 'undefined') this.start = String(data.start)
+        else this.start = '未设置开始时间'
         this.courses = []
         // parse course list
         if (data.course && data.course.length > 0) {
@@ -126,7 +118,15 @@ export default {
       this.$forceUpdate()
     },
     async remove () {
-      this.del = false
+      const res = await this.$swal.fire({
+        title: '删除事务',
+        text: '删除事务会删除此事务以及全部数据，你确定删除么？',
+        showCancelButton: true,
+        confirmButtonText: '删除',
+        cancelButtonText: '关闭',
+        confirmButtonColor: '#d33'
+      })
+      if (!res.isConfirmed) return
       this.submitLoading = true
       try {
         await this.$ajax.delete('/admin/record?id=' + this.tid, { headers: { token: SS.token } })

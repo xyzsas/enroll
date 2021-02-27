@@ -46,7 +46,7 @@ export default {
       this.$emit('input', Math.floor(Date.parse(this.date + ' ' + this.time) / 1000))
     },
     parseDate () {
-      if (!this.value || typeof (this.value) === 'undefined') return
+      if (!this.value || this.value === 'undefined') return
       try {
         const s = new Date(this.value * 1000 - this.tzoffset).toISOString().split('T')
         this.date = s[0]
