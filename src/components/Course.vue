@@ -67,7 +67,7 @@ export default {
         return
       }
       for (const c of this.value) {
-        if (c.name === this.course.name) {
+        if (this.index < 0 && c.name === this.course.name) {
           this.error = '课程已存在'
           return
         }

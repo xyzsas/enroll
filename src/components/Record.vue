@@ -53,7 +53,7 @@ export default {
         this.content = '用户组\t姓名\t课程\n'
         for (const g in group.data) {
           for (const i in group.data[g]) {
-            if (i in record.data) this.content += `${g}\t${group.data[g][i]}\t${courses[record.data[i].value]}`
+            if (i in record.data) this.content += `${g}\t${group.data[g][i]}\t${courses[record.data[i].value]}\n`
           }
         }
         this.load = '下列数据可以直接复制进Excel'
